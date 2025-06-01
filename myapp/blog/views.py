@@ -19,6 +19,9 @@ from django.template.loader import render_to_string
 
 from django.core.mail import send_mail
 
+from django.shortcuts import get_object_or_404
+
+
 # Create your views here.
 
 #def index(request):
@@ -211,5 +214,16 @@ def new_post(request):
 
 
 def edit_post(request,post_id):
-        categories = Category.objects.all()
-        return render(request,'blog/new_post.html',{'categories':categories,'form':form})
+    categories = Category.objects.all()
+    post = get_object_or_404(Post,id=post_id)
+
+    form = PostForm()
+    if request.method =='POST':
+        #form
+        form = PostForm(request.POST ,request.FILES , instance=post)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"Post Updated successfully")
+            return redirect('blog:dashboard')
+
+    return render(request,'blog/edit_post.html',{'categories':categories,'post':post ,'form':form})
