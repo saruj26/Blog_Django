@@ -208,3 +208,8 @@ def new_post(request):
             post.save()
             return redirect('blog:dashboard')
     return render(request,'blog/new_post.html',{'categories':categories,'form':form})
+
+
+def edit_post(request,post_id):
+        categories = Category.objects.all()
+        return render(request,'blog/new_post.html',{'categories':categories,'form':form})
