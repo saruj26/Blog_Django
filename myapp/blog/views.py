@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login , logout as auth_logout
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Group
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.utils.encoding import force_bytes
@@ -21,8 +21,7 @@ from django.core.mail import send_mail
 
 from django.shortcuts import get_object_or_404
 
-from django.contrib.auth.decorators import login_required
-
+from django.contrib.auth.decorators import login_required,permission_required
 
 # Create your views here.
 
@@ -54,6 +53,9 @@ def index(request):
    
 
 def detail(request, slug):
+    if request.user and not request.user.has_perm('blog.view_post'):
+        messages.error(request,"You have no permission to view any post")
+        return redirect('blog:index')
     # getting static data
     # post = next((item for item in posts if item['id'] == int(post_id)), None)
     
@@ -110,7 +112,9 @@ def register(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
-
+            # add user to reader group
+            readers_group,created = Group.objects.get_or_create(name="Readers")
+            user.groups.add(readers_group)
             messages.success(request,'Registration Sccessfull!')
             return redirect("blog:dashboard")  
 
@@ -201,6 +205,7 @@ def reset_password(request,uidb64,token):
     return render(request,'blog/reset_password.html',{'form':form})
 
 @login_required
+@permission_required('blog.add_post',raise_exception=True)
 def new_post(request):
     categories = Category.objects.all()
     form = PostForm()

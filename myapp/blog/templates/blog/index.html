@@ -5,7 +5,9 @@
     <div class="col">
       <h2>{{blog_title | upper}}</h2>
     </div>
+   
     <div class="col-3">
+     
       <div class="input-group">
         <input
           type="text"
@@ -23,6 +25,12 @@
         </button>
       </div>
     </div>
+
+
+     <div>
+    {% include 'blog/includes/errors.html' %}
+    </div>
+
   </div>
 
   <div class="row m-3">
