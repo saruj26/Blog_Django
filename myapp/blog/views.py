@@ -21,6 +21,8 @@ from django.core.mail import send_mail
 
 from django.shortcuts import get_object_or_404
 
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -40,7 +42,7 @@ from django.shortcuts import get_object_or_404
 def index(request):
     blog_title = "Latest Posts"  
 
-    all_posts = Post.objects.all()
+    all_posts = Post.objects.filter(is_published = True)
 
      #paginator
     paginator = Paginator(all_posts,5)
@@ -198,7 +200,7 @@ def reset_password(request,uidb64,token):
                 messages.error(request,'The password link is invalid')
     return render(request,'blog/reset_password.html',{'form':form})
 
-
+@login_required
 def new_post(request):
     categories = Category.objects.all()
     form = PostForm()
@@ -212,7 +214,7 @@ def new_post(request):
             return redirect('blog:dashboard')
     return render(request,'blog/new_post.html',{'categories':categories,'form':form})
 
-
+@login_required
 def edit_post(request,post_id):
     categories = Category.objects.all()
     post = get_object_or_404(Post,id=post_id)
@@ -228,9 +230,17 @@ def edit_post(request,post_id):
 
     return render(request,'blog/edit_post.html',{'categories':categories,'post':post ,'form':form})
 
+@login_required
 def delete_post(request,post_id):
     post = get_object_or_404(Post,id=post_id)
     post.delete()
     messages.success(request,"Post Deleted successfully")
     return redirect('blog:dashboard')
     
+@login_required
+def publish_post(request,post_id):
+    post = get_object_or_404(Post,id=post_id)
+    post.is_published = True
+    post.save()
+    messages.success(request,"Post Published successfully")
+    return redirect('blog:dashboard')
