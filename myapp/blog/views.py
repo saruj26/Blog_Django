@@ -220,6 +220,7 @@ def new_post(request):
     return render(request,'blog/new_post.html',{'categories':categories,'form':form})
 
 @login_required
+@permission_required('blog.change_post',raise_exception=True)
 def edit_post(request,post_id):
     categories = Category.objects.all()
     post = get_object_or_404(Post,id=post_id)
@@ -236,6 +237,7 @@ def edit_post(request,post_id):
     return render(request,'blog/edit_post.html',{'categories':categories,'post':post ,'form':form})
 
 @login_required
+@permission_required('blog.delete_post',raise_exception=True)
 def delete_post(request,post_id):
     post = get_object_or_404(Post,id=post_id)
     post.delete()
@@ -243,6 +245,7 @@ def delete_post(request,post_id):
     return redirect('blog:dashboard')
     
 @login_required
+@permission_required('blog.can_publish',raise_exception=True)
 def publish_post(request,post_id):
     post = get_object_or_404(Post,id=post_id)
     post.is_published = True

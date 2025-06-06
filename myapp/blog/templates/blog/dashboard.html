@@ -58,9 +58,13 @@
                   >
                 </div>
                 <div class="d-flex justify-content-between mt-2">
+                  {% if perms.blog.change_post %}
                   <a class="btn btn-warning btn-sm" href="{% url 'blog:edit_post' post_id=post.id %}">Edit Post</a>
+                  {% endif %}
+                  {% if perms.blog.delete_post %}
                   <button class="btn btn-danger btn-sm" onclick="confirmBeforeDelete(`{% url 'blog:delete_post' post_id=post.id %}`)">Delete Post</button>
-                  {% if not post.is_published %}
+                  {% endif %}
+                  {% if not post.is_published and perms.blog.can_publish %}
                   <a class="btn btn-success btn-sm" href="{% url 'blog:publish_post' post_id=post.id %}">Publish</a>
                   {% endif %}
                 </div>
